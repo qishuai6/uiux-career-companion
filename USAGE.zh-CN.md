@@ -1,6 +1,6 @@
 # UI/UX Career Companion 使用方法
 
-这是一套给 Codex 使用的 UI/UX 职业陪伴 skill。它不是通用设计百科，而是会优先检索你的本地 UI/UX 知识库，再结合当前问题输出判断、框架、清单或行动建议。
+这是一套给 Codex 使用的 UI/UX 职业陪伴 skill。它不是通用设计百科，而是会优先检索你的本地 UI/UX 知识库；如果没有配置知识库，也会基于 skill 内置的诊断框架输出判断、框架、清单或行动建议。
 
 ## 适合用来做什么
 
@@ -95,40 +95,49 @@
 
 它会从作品集、经验匹配、岗位风险、面试准备几个角度给建议。
 
-## 本地知识库要求
+## 本地知识库配置
 
-当前 skill 默认读取这个路径：
+本地知识库不是强制要求，但建议配置。推荐设置环境变量：
 
 ```bash
-/Users/qishuai/Desktop/UIUX知识库_整合版
+export UIUX_KB_ROOT="/absolute/path/to/UIUX知识库_整合版"
+```
+
+这个 skill 也自带一份精选版 `knowledge-base`，所以别人安装后不配置外部知识库也能直接用。你也可以把自己的知识库放在 skill 目录下，命名为：
+
+```bash
+knowledge-base
 ```
 
 搜索脚本位置：
 
 ```bash
-/Users/qishuai/.codex/skills/uiux-career-companion/scripts/search_kb.sh
+scripts/search_kb.sh
 ```
 
-如果你换电脑或移动了知识库，需要同时修改两个地方：
+脚本会按这个顺序找知识库：
 
-1. `SKILL.md` 里的知识库路径。
-2. `scripts/search_kb.sh` 里的 `KB_ROOT`。
+1. `UIUX_KB_ROOT`
+2. `$HOME/Desktop/UIUX知识库_整合版` 等常见本地目录
+3. skill 目录下的内置 `knowledge-base`
+
+如果没有找到任何知识库，skill 不应该中断回答，而是说明“我没有检索到知识库，下面基于 skill 内置框架判断。”
 
 ## 手动测试搜索脚本
 
 可以直接在终端运行：
 
 ```bash
-/Users/qishuai/.codex/skills/uiux-career-companion/scripts/search_kb.sh "作品集 面试"
+scripts/search_kb.sh "作品集 面试"
 ```
 
 也可以限定搜索某个知识库分区：
 
 ```bash
-/Users/qishuai/.codex/skills/uiux-career-companion/scripts/search_kb.sh "作品集 面试" "01_求职面试与作品集"
+scripts/search_kb.sh "作品集 面试" "01_求职面试与作品集"
 ```
 
-如果返回相关 Markdown 文件和行号，说明知识库路径和搜索脚本正常。
+如果返回相关 Markdown 文件和行号，说明知识库路径和搜索脚本正常。默认情况下，新用户会搜到内置精选库；配置 `UIUX_KB_ROOT` 后会优先搜自己的知识库。
 
 ## 输出风格
 
@@ -153,5 +162,4 @@
 
 - 这个仓库只包含 skill 本身，不包含你的本地 UI/UX 知识库内容。
 - GitHub 上的仓库是 private，适合继续放个人工作流。
-- 如果未来要公开仓库，建议先把 `SKILL.md` 和 `README.md` 里的本地用户名、知识库路径改成通用占位符。
-- 如果要给别人用，最好把知识库路径改成环境变量或配置文件，而不是写死在脚本里。
+- 如果未来要公开仓库，不需要暴露个人知识库路径；让用户通过 `UIUX_KB_ROOT` 或 `knowledge-base` 自行配置即可。

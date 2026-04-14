@@ -1,21 +1,49 @@
 ---
 name: uiux-career-companion
 description: |
-  Use when the user wants UI/UX-specific help grounded in qishuai's local knowledge base: portfolio review, interview prep, job search strategy, UX research, interaction design, UI/design systems, design methods, metrics, career growth, or AI-for-design workflows. Especially relevant for requests about作品集, 面试, 跳槽, UI/UX 方法论, 交互设计, 设计系统, 体验度量, or 设计师如何使用 AI.
+  Use when the user wants UI/UX-specific career or practice help: portfolio review, interview prep, job search strategy, UX research, interaction design, UI/design systems, design methods, metrics, career growth, or AI-for-design workflows. If a local UI/UX knowledge base is configured, ground the answer in it; otherwise use the built-in diagnostic frameworks and state that no local knowledge base was consulted. Especially relevant for requests about作品集, 面试, 跳槽, UI/UX 方法论, 交互设计, 设计系统, 体验度量, or 设计师如何使用 AI.
 ---
 
 # UI/UX Career Companion
 
-Use this skill when the user needs advice grounded in the local knowledge base at:
+Use this skill when the user needs UI/UX-specific advice. The skill can work in two modes:
 
-`/Users/qishuai/Desktop/UIUX知识库_整合版`
+1. Knowledge-base mode: use a local Markdown UI/UX knowledge base when one is configured.
+2. Framework mode: if no local knowledge base is available, still answer using the built-in diagnostic and output frameworks in this skill.
 
 This skill is not a generic design explainer. Its job is to:
 
 1. Identify the user's intent
-2. Search only the relevant section(s) of the knowledge base
-3. Synthesize a concrete answer, checklist, diagnosis, or action plan
-4. Prefer actionable judgment over encyclopedic dumping
+2. Search only the relevant section(s) of the knowledge base when available
+3. Fall back gracefully when the knowledge base is missing
+4. Synthesize a concrete answer, checklist, diagnosis, or action plan
+5. Prefer actionable judgment over encyclopedic dumping
+
+## Knowledge Base Setup
+
+The knowledge base is optional but recommended.
+
+Preferred setup:
+
+```bash
+export UIUX_KB_ROOT="/absolute/path/to/UIUX知识库_整合版"
+```
+
+Then use the bundled script:
+
+```bash
+scripts/search_kb.sh "作品集 面试"
+```
+
+The script resolves the knowledge base in this order:
+
+1. `UIUX_KB_ROOT`
+2. Common local folders such as `$HOME/Desktop/UIUX知识库_整合版`
+3. The bundled `knowledge-base` folder inside this skill, if present
+
+If none exists, do not fail the user's request. Continue in Framework mode and briefly say: “我没有检索到知识库，下面基于 skill 内置框架判断。”
+
+The bundled `knowledge-base` is a curated public-lite version. It should make the skill useful immediately after installation, but it should not override a user's own configured or local knowledge base.
 
 ## What This Skill Covers
 
@@ -143,21 +171,27 @@ Translate the user's request into one of these outputs:
 
 If the user is vague, make a reasonable assumption based on the strongest signal instead of asking broad questions.
 
-### Step 2: Search the knowledge base
+### Step 2: Search the knowledge base when available
 
 Use the bundled script:
 
 ```bash
-/Users/qishuai/.codex/skills/uiux-career-companion/scripts/search_kb.sh "query terms"
+scripts/search_kb.sh "query terms"
 ```
 
 If needed, restrict the search to one folder:
 
 ```bash
-/Users/qishuai/.codex/skills/uiux-career-companion/scripts/search_kb.sh "作品集 面试" "01_求职面试与作品集"
+scripts/search_kb.sh "作品集 面试" "01_求职面试与作品集"
 ```
 
 Then read only the top relevant files.
+
+If the script reports that no knowledge base is configured or the target folder is missing:
+
+- Do not ask the user to fix setup unless they explicitly want knowledge-base-backed advice.
+- Do not invent citations or claim the knowledge base says something.
+- Answer from the skill's built-in frameworks and mark the answer as an inference, not a retrieved source.
 
 ### Step 3: Answer with judgment
 
